@@ -1,0 +1,105 @@
+article, aside, blockquote, body, button, code, dd, dialog, div, dl, dt, fieldset, figure, footer, form, h1, h2, h3, h4, h5, h6, header, hgroup, input, legend, li, nav, ol, p, pre, section, td, textarea, th, ul {
+    margin: 0;
+    padding: 0
+}
+
+* {
+    box-sizing: border-box;
+    font-family: 'Microsoft YaHei';
+    font-size: 12px;
+    color: #323232;
+}
+.mt20{margin-top: 20px;}
+.ml10 {
+    margin-left: 10px;
+}
+.fl {
+    float: left;
+}a {
+    text-decoration: none;
+}
+
+
+*, a:focus, input:focus {
+    outline: 0
+}
+
+li, ol, ul {
+    list-style: none;
+}
+
+.area-select {
+  position: relative;
+  /*展开状态下的样式*/ }
+  .area-select .select-data {
+    background-color: #FFF;
+    border: #E1E1E1 1px solid;
+    cursor: pointer; 
+    line-height: 20px;}
+    .area-select .select-data span {
+      padding: 0 5px; }
+  .area-select i.triangle {
+    float: right;
+    margin: 8px 8px 0;
+    border: 5px solid transparent;
+    border-top-color: #fd9601;
+    transition: All 0.2s ease;
+    -webkit-transition: All 0.2s ease; }
+  .area-select .select-wrap {
+    display: none;
+    position: absolute;
+    top: 22px;
+    z-index: 10;
+    padding-top: 5px;
+    width: 456px;
+    background-color: #FFF;
+    border: solid 1px #fd9601; }
+    .area-select .select-wrap .select-tabs {
+      padding-top: 18px;
+      overflow: hidden;
+      border-bottom: solid 1px #fd9601; }
+      .area-select .select-wrap .select-tabs li {
+        float: left;
+        width: 115px;
+        margin-left: 12px;
+        border: solid 1px #E1E1E1;
+        border-bottom: none;
+        text-align: center; }
+        .area-select .select-wrap .select-tabs li a {
+          display: inline-block;
+          line-height: 20px;
+          width: 100%; }
+        .area-select .select-wrap .select-tabs li.active {
+          background-color: #fd9601;
+          border-color: #fd9601; }
+          .area-select .select-wrap .select-tabs li.active span {
+            color: #FFF; }
+          .area-select .select-wrap .select-tabs li.active .triangle {
+            border-bottom-color: #FFF; }
+    .area-select .select-wrap .select-content {
+      padding-bottom: 1em;
+      height: 160px; }
+      .area-select .select-wrap .select-content ul {
+        display: none; }
+      .area-select .select-wrap .select-content li {
+        display: inline-block;
+        margin-top: 1em;
+        width: 74px;
+        line-height: 2;
+        text-align: center; }
+        .area-select .select-wrap .select-content li.selected {
+          background-color: #fd9601; }
+          .area-select .select-wrap .select-content li.selected a {
+            color: #FFF; }
+  .area-select.expand .select-data .triangle, .area-select.expand .active .triangle {
+    margin-top: 2px;
+    border-top-color: transparent;
+    border-bottom-color: #fd9601; }
+  .area-select.expand .select-data {
+    position: relative;
+    z-index: 11;
+    height: 23px;
+    border-color: #fd9601;
+    border-bottom: none; }
+  .area-select.expand .select-wrap {
+    display: block; }
