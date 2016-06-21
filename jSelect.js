@@ -4,12 +4,11 @@
 			split: '/',
 			url: '',
 			data: [],
+			hasWhole: true,
 			onLoad: function() {
 
 			},
-			onSelect: function() {
-
-			},
+			onSelect: function() {},
 			onClose: function() {
 
 			}
@@ -111,15 +110,19 @@
 		function _initContent(selector, source) {
 			var $ul = $.create('ul');
 			$ul.data('index', selector.C().length);
+			$ul.attr('data-index', selector.C().length);
+			selector.P($ul);
 			$.each(source, function(i, item) {
 				var $li = $.create('li'),
 					_h = ['<a href="javascript:">', item.name, '</a>'];
 				$li.P(_h.join(''));
 				if (i === 0) $li.A('selected');
 				$li.data('code', item.code);
+				$li.data('index', i);
+				$li.data('data', item.data);
 				$ul.P($li);
+
 			});
-			selector.P($ul);
 			if (!!source[0].data && source[0].data.length) {
 				_initContent(selector, source[0].data);
 			}
@@ -191,37 +194,35 @@
 		function _liClick(e) {
 			var $parent = $(this).parent(),
 				_index = $parent.data('index'),
-				_len = _self.selectedCodes.length,
 				_currentCode = $(this).data('code');
 			$parent.C().R('selected');
 			$(this).A('selected');
 
-			//保存当前选择区域编码
-			if (_len > _index)
-				_self.selectedCodes[_index] = _currentCode;
-			else {
-				if (_len < _index)
-					for (var i = _index; i > _len; i--) {
-						_self.selectedCodes.push(null);
-					}
-				_self.selectedCodes.push(_currentCode);
-			}
+			_setSelectCodes(_index, _currentCode);
 
 			//回调自定义点击事件
-			_self.options.onSelect(_currentCode);
+			var _return = _self.options.onSelect($(this).data('index'), _currentCode);
 
-
-			//选项不存在,直接设置span
+			//选项不存在
 			if ($ctrl.length == 1) {
 				$head.eq(0).find('span').text($(this).text());
 			} else {
-				//设置选项显示文本内容
+				//设置选项
 				var $tab = $parent.parent().prev().C().eq(_index);
 				$tab.find('span').text($(this).text());
-				//切换至下一个选项
-				if ($tab.next().length) $tab.next().mousedown();
-				else {
-					//获取选项内容 设置到主显示文本框上
+
+				if ($tab.next().length) {
+					var _h = true,
+						_d = $(this).data('data'),
+						$nTab = $tab.next();
+					_render($parent.next(), _d);
+					if (!_return)
+						$nTab.mousedown()
+					else
+						_h = false;
+				}
+				if (!_h) {
+					//设置主文本框
 					var vArr = $.trim($ctrl.eq(0).text()).split(' ');
 					$.each($head.eq(0).find('span'), function(i, elm) {
 						$(elm).text(vArr[i]);
@@ -229,7 +230,7 @@
 				}
 			}
 
-			if (!$parent.next().length) {
+			if (!$parent.next().length || !!_return) {
 				//末个选项点击后触发关闭
 				$head.mousedown();
 				//回调自定义关闭事件
@@ -243,6 +244,58 @@
 			var _target = evt.srcElement || evt.target;
 			if (selector.hasClass(_expand) && _target.parentElement.parentElement != selector[0])
 				selector.R(_expand);
+		}
+
+		function _render(selector, source) {
+			var $lis = selector.children();
+			$lis.removeClass('selected');
+			$.each(source, function(i, _) {
+				var $li = $lis.eq(i);
+				if ($li.length) {
+					$li.children().text(_.name);
+				} else {
+					$li = $('<li></li>');
+					var $a = $('<a href="javascript:""></a>');
+					$li.data('index', $lis.length);
+					$a.text(_.name);
+					$li.append($a);
+					selector.append($li);
+					_eventHandler($li, _click, _liClick);
+				}
+				if (i == 0) $li.addClass('selected');
+				$li.data('code', _.code);
+				$li.data('data', _.data);
+			});
+			if (source.length < $lis.length) {
+				for (var i = $lis.length - 1; i >= source.length; i--) {
+					$lis[i].remove();
+				}
+			}
+			if (!!source && source.length) {
+				var _i = selector.data('index'),
+					$tab = selector.parent().prev().C().eq(_i);
+				_setSelectCodes(_i, source[0].code);
+				$tab.find('span').text(source[0].name);
+			}
+			if (selector.next().length && !!source[0].data) {
+				var _d = source[0].data;
+				_render(selector.next(), _d);
+			}
+		}
+
+
+		function _setSelectCodes(_index, _currentCode) {
+			var _len = _self.selectedCodes.length;
+			//保存当前选择区域编码
+			if (_len > _index)
+				_self.selectedCodes[_index] = _currentCode;
+			else {
+				if (_len < _index)
+					for (var i = _index; i > _len; i--) {
+						_self.selectedCodes.push(null);
+					}
+				_self.selectedCodes.push(_currentCode);
+			}
 		}
 	}
 
