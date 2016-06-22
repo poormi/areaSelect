@@ -56,6 +56,7 @@
 		var _self = this,
 			args = Array.prototype.slice.call(arguments);
 		_self.A(_sClass);
+		_self.parent().css('position', 'relative');
 		return new areaSelect(_self, args[0]);
 	};
 
@@ -70,7 +71,7 @@
 			if (!!data[0].data) {
 				$u = $.create('ul', 'select-tabs');
 				$w.P($u);
-			}
+			} else $w.A('single');
 			selector.P($w);
 
 			//初始化结果区域（默认第一条数据）
