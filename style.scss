@@ -1,0 +1,86 @@
+
+.area-select{
+	.select-data{
+		background-color:#FFF;
+		border: $borderColor 1px solid;
+		cursor: pointer;
+		span{
+			padding:0 5px;
+		}		
+	}
+	i.triangle{
+		float: right;
+		margin: 8px 8px 0;
+		border: 5px solid transparent;
+		border-top-color: $orange;
+	    transition: All .2s ease;
+		-webkit-transition: All .2s ease;
+	}
+	.select-wrap{
+		display: none;
+		position:absolute;
+		top: 22px;
+		z-index: 10;
+		padding-top: 5px;
+		background-color: #FFF;
+		border: solid 1px $orange;		
+		.select-tabs{
+			padding: 18px 50px 0 0;
+			overflow: hidden;
+			border-bottom: solid 1px $orange;
+			li{
+				float: left;
+				width: 115px;
+				margin-left: 12px;
+				border: solid 1px $borderColor;
+				border-bottom: none;
+				text-align: center;
+				a{display:inline-block;width:100%;}
+				&.active{
+					background-color:$orange;
+					span{color: #FFF};
+					border-color:$orange;
+					.triangle{
+						border-bottom-color: #FFF;
+					}
+				}
+			}
+		}
+		.select-content{
+			padding-bottom: 1em;
+			height: 160px;
+			ul{display:none;}
+			li{
+				display: inline-block;
+				margin-top: 1em;
+				padding: 0 10px;
+				min-width: 74px;
+				line-height: 2;
+				text-align: center;
+				&.selected{
+					background-color:$orange;
+					a{color: #FFF};
+				}
+			}
+		}
+		&.single{
+			width: 300px;
+		}
+	}
+	/*展开状态下的样式*/
+	&.expand{
+		.select-data .triangle,.active .triangle{
+			margin-top: 2px;
+			border-top-color:transparent;
+			border-bottom-color: $orange;
+		}
+		.select-data{
+			position: relative;
+			z-index: 11;
+			height: 23px;
+			border-color: $orange;
+			border-bottom: none;
+		}
+		.select-wrap{display:block;}
+	} 
+}
