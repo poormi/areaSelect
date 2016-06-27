@@ -173,26 +173,24 @@
 		function _ctrlClick() {
 			var $e = $('.' + _expand + '.' + _sClass),
 				$p = $(this).parent();
-			if ($p.hasClass(_expand)) {
-				$p.R(_expand);
-			} else {
+			if ($p.hasClass(_expand)) $p.R(_expand);
+			else {
 				if ($e.length)
 					$e.R(_expand);
 				$p.A(_expand);
 			}
 		}
 
-		function _tabsClick(e) {
+		function _tabsClick() {
 			$ctrl.find('li.active').R('active');
 			var _index = $(this).data('index'),
 				$all = $(this).parent().next().find('ul');
 			$(this).toggleClass('active');
 			$all.hide();
 			$all.eq(_index).show();
-			e.stopPropagation();
 		}
 
-		function _liClick(e) {
+		function _liClick() {
 			var $parent = $(this).parent(),
 				_index = $parent.data('index'),
 				_currentCode = $(this).data('code');
@@ -237,14 +235,11 @@
 				//回调自定义关闭事件
 				_self.options.onClose(_self.selectedCodes);
 			}
-
-			e.stopPropagation();
 		}
 
 		function _bodyClick(evt) {
 			var _target = evt.srcElement || evt.target;
-			if (selector.hasClass(_expand) && _target.parentElement.parentElement != selector[0])
-				selector.R(_expand);
+			if (selector.hasClass(_expand) && !$(_target).closest($head[0]).length) selector.R(_expand);
 		}
 
 		function _render(selector, source) {
