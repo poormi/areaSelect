@@ -4,7 +4,7 @@
 			split: '/',
 			url: '',
 			data: [],
-			hasWhole: true,
+			async: true,
 			onLoad: function() {
 
 			},
@@ -56,6 +56,7 @@
 		var _self = this,
 			args = Array.prototype.slice.call(arguments);
 		_self.A(_sClass);
+		_self.empty();
 		_self.parent().css('position', 'relative');
 		return new areaSelect(_self, args[0]);
 	};
@@ -197,49 +198,67 @@
 			$parent.C().R('selected');
 			$(this).A('selected');
 
-			_setSelectCodes(_index, _currentCode);
+			_setSelectCodes(_index, {
+				id: _currentCode,
+				name: $(this).text()
+			});
 
 			//回调自定义点击事件
-			var _return = _self.options.onSelect($(this).data('index'), _currentCode);
+			var _return = _self.options.onSelect($(this).data('index'), {
+				id: _currentCode,
+				name: $(this).text()
+			}, $(this));
 
-			//选项不存在
-			if ($ctrl.length == 1) {
-				$head.eq(0).find('span').text($(this).text());
-			} else {
-				//设置选项
-				var $tab = $parent.parent().prev().C().eq(_index);
-				$tab.find('span').text($(this).text());
+			if (_self.options.async) {
+				var that = this;
+				_return.done(function() {
+					done.call(that);
+				});
+			} else done.call(this);
 
-				if ($tab.next().length) {
-					var _h = true,
-						_d = $(this).data('data'),
-						$nTab = $tab.next();
-					_render($parent.next(), _d);
-					if (!_return)
-						$nTab.mousedown()
-					else
-						_h = false;
+			function done() {
+				//选项不存在
+				if ($ctrl.length == 1) {
+					$head.eq(0).find('span').text($(this).text());
+				} else {
+					//设置选项
+					var $tab = $parent.parent().prev().C().eq(_index);
+					$tab.find('span').text($(this).text());
+
+					if ($tab.next().length) {
+						var _h = true,
+							_d = $(this).data('data'),
+							$nTab = $tab.next();
+						_render($parent.next(), _d);
+						if (!_return || typeof _return == "object")
+							$nTab.mousedown()
+						else
+							_h = false;
+					}
+					if (!_h) {
+						//设置主文本框
+						var vArr = $.trim($ctrl.eq(0).text()).split(' ');
+						$.each($head.eq(0).find('span'), function(i, elm) {
+							$(elm).text(vArr[i]);
+						});
+					}
 				}
-				if (!_h) {
-					//设置主文本框
-					var vArr = $.trim($ctrl.eq(0).text()).split(' ');
-					$.each($head.eq(0).find('span'), function(i, elm) {
-						$(elm).text(vArr[i]);
-					});
-				}
-			}
 
-			if (!$parent.next().length || !!_return) {
-				//末个选项点击后触发关闭
-				$head.mousedown();
-				//回调自定义关闭事件
-				_self.options.onClose(_self.selectedCodes);
+				if (!$parent.next().length || !!_return && typeof _return == "boolean") {
+					//末个选项点击后触发关闭
+					$head.mousedown();
+					//回调自定义关闭事件
+					_self.options.onClose(_self.selectedCodes);
+				}
 			}
 		}
 
 		function _bodyClick(evt) {
 			var _target = evt.srcElement || evt.target;
-			if (selector.hasClass(_expand) && !$(_target).closest($head[0]).length) selector.R(_expand);
+
+			console.log($head[0]);
+
+			if (selector.hasClass(_expand) && !$(_target).closest('.' + $head[0].className).length) selector.R(_expand);
 		}
 
 		function _render(selector, source) {
@@ -272,10 +291,11 @@
 					$tab = selector.parent().prev().C().eq(_i);
 				_setSelectCodes(_i, source[0].code);
 				$tab.find('span').text(source[0].name);
-			}
-			if (selector.next().length && !!source[0].data) {
-				var _d = source[0].data;
-				_render(selector.next(), _d);
+
+				if (selector.next().length && !!source[0].data) {
+					var _d = source[0].data;
+					_render(selector.next(), _d);
+				}
 			}
 		}
 
