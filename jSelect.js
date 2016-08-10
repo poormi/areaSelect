@@ -3,8 +3,9 @@
 	var defaults = {
 			split: '/',
 			url: '',
+			disabled: false,
 			data: [],
-			async: true,
+			async: false,
 			onLoad: function() {
 
 			},
@@ -32,6 +33,8 @@
 			var that = this,
 				options = that.options = $.extend({}, defaults, context);
 			that.selector = selector;
+			that.disabled = options.disabled;
+			if (!!options.disabled) that.selector.addClass('disabled');
 			that.selectedCodes = [];
 			//优先使用设置的data属性
 			if (options.data.length) {
@@ -50,6 +53,20 @@
 		},
 		getSelectedCodes: function() {
 			return this.selectedCodes;
+		},
+		setDisabled: function(disabled) {
+			if (disabled == void 0) this.disabled = !this.disabled, this.selector.toggleClass('disabled');
+			else this.disabled = disabled, !disabled ? this.selector.removeClass('disabled') : this.selector.addClass('disabled');
+		},
+		setSelected: function(index, tabIndex) {
+			var _i = index == void 0 ? 0 : index,
+				_ti = tabIndex == void 0 ? 0 : tabIndex;
+			this.$content.find("ul").eq(_ti).children().eq(_i).mousedown();
+			this.close();
+		},
+		close: function() {
+			this.$head.mousedown();
+			this.options.onClose(this.selectedCodes);
 		}
 	};
 	$.fn.areaSelect = function() {
@@ -78,6 +95,8 @@
 			//初始化结果区域（默认第一条数据）
 			var def = data[0];
 			_initDefault($v, $u, def);
+			this.$tab = $u;
+			this.$head = $v;
 			//默认首个选项激活状态
 			if ($u.length)
 				$u.C().eq(0).A('active');
@@ -85,6 +104,7 @@
 			//初始化展开的选择区域
 			var $c = $.create('div', 'select-content clear');
 			$w.P($c);
+			this.$content = $c;
 			_initContent($c, source);
 			//默认显示首个选择区域
 			$c.C().eq(0).show();
@@ -96,11 +116,13 @@
 				$li = $('<li>'),
 				_h = ['<a href="javascript:"><span>', def.name, '</span><i class="triangle"> </i>', '</a>'];
 			$s.html(def.name);
+			$s.attr('title', def.name);
 			$s.data('code', def.code);
 			child1.P($s);
 			if (child2.length) {
 				$li.data('code', def.code);
 				$li.data('index', child2.C().length);
+				$li.attr('data-index', child2.C().length);
 				child2.P($li.P(_h.join('')));
 			}
 			if (!!def.data && def.data.length) {
@@ -172,6 +194,7 @@
 		_eventHandler($(d), _click, _bodyClick);
 
 		function _ctrlClick() {
+			if (!!_self.disabled) return;
 			var $e = $('.' + _expand + '.' + _sClass),
 				$p = $(this).parent();
 			if ($p.hasClass(_expand)) $p.R(_expand);
@@ -209,7 +232,7 @@
 				name: $(this).text()
 			}, $(this));
 
-			if (_self.options.async) {
+			if (_self.options.async && typeof _return === 'object') {
 				var that = this;
 				_return.done(function() {
 					done.call(that);
@@ -237,7 +260,10 @@
 					}
 					if (!_h) {
 						//设置主文本框
-						var vArr = $.trim($ctrl.eq(0).text()).split(' ');
+						var vArr = [];
+						$.each($ctrl.eq(0).children(), function(i, elm) {
+							vArr.push($.trim($(elm).text()));
+						});
 						$.each($head.eq(0).find('span'), function(i, elm) {
 							$(elm).text(vArr[i]);
 						});
@@ -255,9 +281,6 @@
 
 		function _bodyClick(evt) {
 			var _target = evt.srcElement || evt.target;
-
-			console.log($head[0]);
-
 			if (selector.hasClass(_expand) && !$(_target).closest('.' + $head[0].className).length) selector.R(_expand);
 		}
 
@@ -289,7 +312,10 @@
 			if (!!source && source.length) {
 				var _i = selector.data('index'),
 					$tab = selector.parent().prev().C().eq(_i);
-				_setSelectCodes(_i, source[0].code);
+				_setSelectCodes(_i, {
+					id: source[0].code,
+					name: source[0].name
+				});
 				$tab.find('span').text(source[0].name);
 
 				if (selector.next().length && !!source[0].data) {
